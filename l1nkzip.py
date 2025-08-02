@@ -58,7 +58,7 @@ def print_api_error(exc: httpx.HTTPStatusError) -> None:
 
 @app.command()
 def shorten(url: str, json_output: bool = typer.Option(False, "--json", help="Output as JSON")) -> None:
-    """Shorten a URL."""
+    """Shorten a URL. If --json is used, prints the full API response from /url."""
     # Simple URL validation
     if not re.match(r"^https?://", url):
         console.print(f"[red]Invalid URL:[/red] {url}")
@@ -86,7 +86,7 @@ def info(
     limit: int = typer.Option(DEFAULT_LIMIT, help="Max number of URLs to search"),
     json_output: bool = typer.Option(False, "--json", help="Output as JSON"),
 ) -> None:
-    """Show info about a short link (target URL and visits)."""
+    """Show info about a short link (target URL and visits). If --json is used, prints the full API response from /list/{token}."""
     token_val = get_token(token)
     try:
         resp = client.get(f"{API_BASE}/list/{token_val}", params={"limit": limit})
@@ -97,13 +97,17 @@ def info(
             if item.get("link") == link or item.get("full_link") == link:
                 found = item
                 break
-        if not found:
-            console.print(f"[red]No info found for link:[/red] {link}")
-            raise typer.Exit(1)
         if json_output:
             import json
-            console.print(json.dumps(found, indent=2))
+            console.print(json.dumps(data, indent=2))
+            if found:
+                console.print(f"[bold green]Found link:[/bold green] {link}")
+            else:
+                console.print(f"[red]No info found for link:[/red] {link}")
         else:
+            if not found:
+                console.print(f"[red]No info found for link:[/red] {link}")
+                raise typer.Exit(1)
             table = Table(title="Link Info")
             table.add_column("Field")
             table.add_column("Value")
@@ -123,7 +127,7 @@ def list(
     limit: int = typer.Option(DEFAULT_LIMIT, help="Max number of URLs to list"),
     json_output: bool = typer.Option(False, "--json", help="Output as JSON"),
 ) -> None:
-    """List all URLs (requires token)."""
+    """List all URLs (requires token). If --json is used, prints the full API response from /list/{token}."""
     token_val = get_token(token)
     try:
         resp = client.get(f"{API_BASE}/list/{token_val}", params={"limit": limit})
@@ -152,7 +156,7 @@ def update_phishtank(
     cleanup_days: int = typer.Option(DEFAULT_CLEANUP_DAYS, help="Days to keep old entries"),
     json_output: bool = typer.Option(False, "--json", help="Output as JSON"),
 ) -> None:
-    """Update PhishTank DB (admin, requires token)."""
+    """Update PhishTank DB (admin, requires token). If --json is used, prints the full API response from /phishtank/update/{token}."""
     token_val = get_token(token)
     try:
         resp = client.get(
