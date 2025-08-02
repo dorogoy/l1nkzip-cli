@@ -58,7 +58,7 @@ def print_api_error(exc: httpx.HTTPStatusError) -> None:
 
 @app.command()
 def shorten(url: str, json_output: bool = typer.Option(False, "--json", help="Output as JSON")) -> None:
-    """Shorten a URL."""
+    """Shorten a URL. If --json is used, prints the full API response from /url."""
     # Simple URL validation
     if not re.match(r"^https?://", url):
         console.print(f"[red]Invalid URL:[/red] {url}")
@@ -80,21 +80,40 @@ def shorten(url: str, json_output: bool = typer.Option(False, "--json", help="Ou
 
 
 @app.command()
-def info(link: str, json_output: bool = typer.Option(False, "--json", help="Output as JSON")) -> None:
-    """Get info about a short link."""
+def info(
+    link: str,
+    token: Optional[str] = typer.Option(None, help="API token (or set L1NKZIP_TOKEN env var)"),
+    limit: int = typer.Option(DEFAULT_LIMIT, help="Max number of URLs to search"),
+    json_output: bool = typer.Option(False, "--json", help="Output as JSON"),
+) -> None:
+    """Show info about a short link (target URL and visits). If --json is used, prints the full API response from /list/{token}."""
+    token_val = get_token(token)
     try:
-        resp = client.get(f"{API_BASE}/{link}")
+        resp = client.get(f"{API_BASE}/list/{token_val}", params={"limit": limit})
         resp.raise_for_status()
         data = resp.json()
+        found = None
+        for item in data:
+            if item.get("link") == link or item.get("full_link") == link:
+                found = item
+                break
         if json_output:
             import json
             console.print(json.dumps(data, indent=2))
+            if found:
+                console.print(f"[bold green]Found link:[/bold green] {link}")
+            else:
+                console.print(f"[red]No info found for link:[/red] {link}")
         else:
+            if not found:
+                console.print(f"[red]No info found for link:[/red] {link}")
+                raise typer.Exit(1)
             table = Table(title="Link Info")
             table.add_column("Field")
             table.add_column("Value")
-            for k, v in data.items():
-                table.add_row(str(k), str(v))
+            table.add_row("Short Link", found["link"])
+            table.add_row("Full URL", found["url"])
+            table.add_row("Visits", str(found["visits"]))
             console.print(table)
     except httpx.HTTPStatusError as exc:
         print_api_error(exc)
@@ -108,7 +127,7 @@ def list(
     limit: int = typer.Option(DEFAULT_LIMIT, help="Max number of URLs to list"),
     json_output: bool = typer.Option(False, "--json", help="Output as JSON"),
 ) -> None:
-    """List all URLs (requires token)."""
+    """List all URLs (requires token). If --json is used, prints the full API response from /list/{token}."""
     token_val = get_token(token)
     try:
         resp = client.get(f"{API_BASE}/list/{token_val}", params={"limit": limit})
@@ -137,7 +156,7 @@ def update_phishtank(
     cleanup_days: int = typer.Option(DEFAULT_CLEANUP_DAYS, help="Days to keep old entries"),
     json_output: bool = typer.Option(False, "--json", help="Output as JSON"),
 ) -> None:
-    """Update PhishTank DB (admin, requires token)."""
+    """Update PhishTank DB (admin, requires token). If --json is used, prints the full API response from /phishtank/update/{token}."""
     token_val = get_token(token)
     try:
         resp = client.get(
