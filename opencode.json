@@ -1,0 +1,10 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "mcp": {
+    "l1nkzip-docs": {
+      "type": "remote",
+      "url": "https://gitmcp.io/dorogoy/l1nkZip",
+      "enabled": true
+    }
+  }
+}

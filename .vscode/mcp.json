@@ -1,0 +1,9 @@
+{
+	"servers": {
+		"l1nkZip docs": {
+			"url": "https://gitmcp.io/dorogoy/l1nkZip",
+			"type": "http"
+		}
+	},
+	"inputs": []
+}
