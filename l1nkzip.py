@@ -80,21 +80,36 @@ def shorten(url: str, json_output: bool = typer.Option(False, "--json", help="Ou
 
 
 @app.command()
-def info(link: str, json_output: bool = typer.Option(False, "--json", help="Output as JSON")) -> None:
-    """Get info about a short link."""
+def info(
+    link: str,
+    token: Optional[str] = typer.Option(None, help="API token (or set L1NKZIP_TOKEN env var)"),
+    limit: int = typer.Option(DEFAULT_LIMIT, help="Max number of URLs to search"),
+    json_output: bool = typer.Option(False, "--json", help="Output as JSON"),
+) -> None:
+    """Show info about a short link (target URL and visits)."""
+    token_val = get_token(token)
     try:
-        resp = client.get(f"{API_BASE}/{link}")
+        resp = client.get(f"{API_BASE}/list/{token_val}", params={"limit": limit})
         resp.raise_for_status()
         data = resp.json()
+        found = None
+        for item in data:
+            if item.get("link") == link or item.get("full_link") == link:
+                found = item
+                break
+        if not found:
+            console.print(f"[red]No info found for link:[/red] {link}")
+            raise typer.Exit(1)
         if json_output:
             import json
-            console.print(json.dumps(data, indent=2))
+            console.print(json.dumps(found, indent=2))
         else:
             table = Table(title="Link Info")
             table.add_column("Field")
             table.add_column("Value")
-            for k, v in data.items():
-                table.add_row(str(k), str(v))
+            table.add_row("Short Link", found["link"])
+            table.add_row("Full URL", found["url"])
+            table.add_row("Visits", str(found["visits"]))
             console.print(table)
     except httpx.HTTPStatusError as exc:
         print_api_error(exc)
