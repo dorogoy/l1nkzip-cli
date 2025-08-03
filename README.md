@@ -15,26 +15,22 @@ A simple, modern Python CLI to interact with the [L1nkZip](https://l1nk.zip) URL
 
 - Python 3.12+
 - [uv](https://github.com/astral-sh/uv) (for running the script and managing dependencies)
+- [ruff](https://github.com/astral-sh/ruff) (for linting, formatting, and import sorting)
 
 ## Installation
 
 You can download the latest version with:
 
 ```sh
-curl -O https://raw.githubusercontent.com/yourusername/l1nkzip-cli/main/l1nkzip.py
-chmod +x l1nkzip.py
-```
-
-Or just run it directly with uv:
-
-```sh
-uv run l1nkzip.py [COMMAND] [OPTIONS]
+curl -O https://raw.githubusercontent.com/dorogoy/l1nkzip-cli/master/main.py
+mv main.py l1nkzip
+chmod +x l1nkzip
 ```
 
 ## Usage
 
 ```sh
-uv run l1nkzip.py --help
+l1nkzip --help
 ```
 
 ### Commands
@@ -55,7 +51,7 @@ For commands that require a token, you can either:
 ## Example
 
 ```sh
-uv run l1nkzip.py shorten https://www.google.com
+l1nkzip shorten https://www.google.com
 ```
 
 ## License

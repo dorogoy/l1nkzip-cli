@@ -20,7 +20,7 @@ Commands:
 
 import os
 import re
-from typing import Optional, Any
+from typing import Optional
 
 import httpx
 import typer
@@ -39,6 +39,7 @@ L1NKZIP_TOKEN: Optional[str] = os.environ.get("L1NKZIP_TOKEN")
 
 client = httpx.Client(timeout=TIMEOUT)
 
+
 def get_token(token: Optional[str] = None) -> str:
     """Retrieve API token from argument, env, or prompt."""
     if token:
@@ -46,6 +47,7 @@ def get_token(token: Optional[str] = None) -> str:
     if L1NKZIP_TOKEN:
         return L1NKZIP_TOKEN
     return typer.prompt("Enter your API token", hide_input=True)
+
 
 def print_api_error(exc: httpx.HTTPStatusError) -> None:
     try:
@@ -57,7 +59,9 @@ def print_api_error(exc: httpx.HTTPStatusError) -> None:
 
 
 @app.command()
-def shorten(url: str, json_output: bool = typer.Option(False, "--json", help="Output as JSON")) -> None:
+def shorten(
+    url: str, json_output: bool = typer.Option(False, "--json", help="Output as JSON")
+) -> None:
     """Shorten a URL. If --json is used, prints the full API response from /url."""
     # Simple URL validation
     if not re.match(r"^https?://", url):
@@ -69,6 +73,7 @@ def shorten(url: str, json_output: bool = typer.Option(False, "--json", help="Ou
         data = resp.json()
         if json_output:
             import json
+
             console.print(json.dumps(data, indent=2))
         else:
             console.print(f"[bold green]Shortened:[/bold green] {data['full_link']}")
@@ -82,7 +87,9 @@ def shorten(url: str, json_output: bool = typer.Option(False, "--json", help="Ou
 @app.command()
 def info(
     link: str,
-    token: Optional[str] = typer.Option(None, help="API token (or set L1NKZIP_TOKEN env var)"),
+    token: Optional[str] = typer.Option(
+        None, help="API token (or set L1NKZIP_TOKEN env var)"
+    ),
     limit: int = typer.Option(DEFAULT_LIMIT, help="Max number of URLs to search"),
     json_output: bool = typer.Option(False, "--json", help="Output as JSON"),
 ) -> None:
@@ -99,6 +106,7 @@ def info(
                 break
         if json_output:
             import json
+
             console.print(json.dumps(data, indent=2))
             if found:
                 console.print(f"[bold green]Found link:[/bold green] {link}")
@@ -123,7 +131,9 @@ def info(
 
 @app.command()
 def list(
-    token: Optional[str] = typer.Option(None, help="API token (or set L1NKZIP_TOKEN env var)"),
+    token: Optional[str] = typer.Option(
+        None, help="API token (or set L1NKZIP_TOKEN env var)"
+    ),
     limit: int = typer.Option(DEFAULT_LIMIT, help="Max number of URLs to list"),
     json_output: bool = typer.Option(False, "--json", help="Output as JSON"),
 ) -> None:
@@ -135,6 +145,7 @@ def list(
         data = resp.json()
         if json_output:
             import json
+
             console.print(json.dumps(data, indent=2))
         else:
             table = Table(title="Shortened URLs")
@@ -152,8 +163,12 @@ def list(
 
 @app.command()
 def update_phishtank(
-    token: Optional[str] = typer.Option(None, help="API token (or set L1NKZIP_TOKEN env var)"),
-    cleanup_days: int = typer.Option(DEFAULT_CLEANUP_DAYS, help="Days to keep old entries"),
+    token: Optional[str] = typer.Option(
+        None, help="API token (or set L1NKZIP_TOKEN env var)"
+    ),
+    cleanup_days: int = typer.Option(
+        DEFAULT_CLEANUP_DAYS, help="Days to keep old entries"
+    ),
     json_output: bool = typer.Option(False, "--json", help="Output as JSON"),
 ) -> None:
     """Update PhishTank DB (admin, requires token). If --json is used, prints the full API response from /phishtank/update/{token}."""
@@ -167,9 +182,12 @@ def update_phishtank(
         data = resp.json()
         if json_output:
             import json
+
             console.print(json.dumps(data, indent=2))
         else:
-            console.print(f"[bold green]PhishTank updated:[/bold green] {data.get('detail', str(data))}")
+            console.print(
+                f"[bold green]PhishTank updated:[/bold green] {data.get('detail', str(data))}"
+            )
     except httpx.HTTPStatusError as exc:
         print_api_error(exc)
     except Exception as e:
@@ -177,5 +195,10 @@ def update_phishtank(
 
 
 if __name__ == "__main__":
-    app()
+    import sys
+
+    if len(sys.argv) == 1:
+        app(["--help"])
+    else:
+        app()
     client.close()
