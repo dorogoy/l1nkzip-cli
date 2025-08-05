@@ -9,7 +9,7 @@
 L1nkZip CLI: Interact with the l1nkZip API from your terminal.
 
 Usage:
-  uv l1nkzip.py [COMMAND] [OPTIONS]
+  uv main.py [COMMAND] [OPTIONS]
 
 Commands:
   shorten         Shorten a URL

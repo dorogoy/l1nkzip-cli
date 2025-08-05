@@ -23,14 +23,14 @@ You can download the latest version with:
 
 ```sh
 curl -O https://raw.githubusercontent.com/dorogoy/l1nkzip-cli/master/main.py
-mv main.py l1nkzip
+chmod +x main.py
 chmod +x l1nkzip
 ```
 
 ## Usage
 
 ```sh
-l1nkzip --help
+./main.py --help
 ```
 
 ### Commands
@@ -51,7 +51,7 @@ For commands that require a token, you can either:
 ## Example
 
 ```sh
-l1nkzip shorten https://www.google.com
+./main.py shorten https://www.google.com
 ```
 
 ## License
