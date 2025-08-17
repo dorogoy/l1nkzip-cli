@@ -40,13 +40,25 @@ chmod +x l1nkzip
 - `list [--token <token>] [--limit <n>]`: List all URLs (requires token)
 - `update-phishtank [--token <token>] [--cleanup-days <n>]`: Update PhishTank DB (admin, requires token)
 
-### Token
+### Configuration
+
+#### API Token
 
 For commands that require a token, you can either:
 
 - Pass it as a command-line option (`--token <token>`)
 - Set the `L1NKZIP_TOKEN` environment variable
 - The CLI will prompt you if the token is not provided
+
+#### Custom API Endpoint
+
+To use a custom API endpoint (e.g., self-hosted instance), set the `L1NKZIP_API_URL` environment variable:
+
+```sh
+export L1NKZIP_API_URL="https://your-custom-domain.com"
+```
+
+If not set, the CLI will default to `https://l1nk.zip`.
 
 ## Example
 

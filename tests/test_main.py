@@ -392,6 +392,50 @@ class TestAPIRequest:
         assert "Network error:" in mock_print.call_args[0][0]
 
 
+class TestAPIEndpointConfiguration:
+    """Test API endpoint configuration."""
+
+    def test_api_base_default(self):
+        """Test API_BASE uses default when no env var is set."""
+        with patch.dict(os.environ, {}, clear=True):
+            # Need to reload the module to pick up env changes
+            import importlib
+
+            import main
+
+            importlib.reload(main)
+            assert main.API_BASE == "https://l1nk.zip"
+
+    def test_api_base_from_env(self):
+        """Test API_BASE uses environment variable when set."""
+        test_url = "http://custom-api.example.com"
+        with patch.dict(os.environ, {"L1NKZIP_API_URL": test_url}):
+            # Need to reload the module to pick up env changes
+            import importlib
+
+            import main
+
+            importlib.reload(main)
+            assert main.API_BASE == test_url
+
+    def test_client_uses_configured_base_url(self):
+        """Test that HTTP client uses the configured base URL."""
+        test_url = "http://custom-api.example.com"
+        with patch.dict(os.environ, {"L1NKZIP_API_URL": test_url}):
+            # Need to reload the module to pick up env changes
+            import importlib
+
+            import main
+
+            importlib.reload(main)
+
+            # Verify the API_BASE was set correctly
+            assert main.API_BASE == test_url
+
+            # The client should have been created with the correct base URL
+            assert main.client.base_url == test_url
+
+
 class TestCLIIntegration:
     """Test CLI integration."""
 

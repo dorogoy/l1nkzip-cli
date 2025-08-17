@@ -7,6 +7,7 @@
 
 ## Recent Changes
 - Refactored main.py with significant improvements:
+  - Configurable API endpoint via L1NKZIP_API_URL environment variable
   - Centralized HTTP client with base_url and timeout configuration
   - Added api_request helper function for consistent API interactions
   - Improved error handling with user-friendly messages via Rich

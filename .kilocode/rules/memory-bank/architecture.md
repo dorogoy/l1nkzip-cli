@@ -18,6 +18,7 @@ graph TD
 2. **Rich Library**: For beautiful terminal output
 3. **httpx**: Modern HTTP client with async support
 4. **Centralized Error Handling**: `print_api_error` function
+5. **Configurable API Endpoint**: Environment variable support for custom deployments
 
 ## Critical Paths
 1. URL shortening workflow:

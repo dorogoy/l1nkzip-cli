@@ -28,7 +28,7 @@ import typer
 from rich.console import Console
 from rich.table import Table
 
-API_BASE = "https://l1nk.zip"
+API_BASE = os.environ.get("L1NKZIP_API_URL", "https://l1nk.zip")
 DEFAULT_LIMIT = 100
 DEFAULT_CLEANUP_DAYS = 5
 TIMEOUT = 10.0

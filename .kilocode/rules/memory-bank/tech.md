@@ -31,3 +31,4 @@ graph LR
 ## Constraints
 - Requires Python 3.12+
 - Needs L1NKZIP_TOKEN for authenticated operations
+- Customizable API endpoint via L1NKZIP_API_URL
