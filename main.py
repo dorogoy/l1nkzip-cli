@@ -36,8 +36,6 @@ TIMEOUT = 10.0
 app = typer.Typer()
 console = Console()
 
-L1NKZIP_TOKEN: Optional[str] = os.environ.get("L1NKZIP_TOKEN")
-
 # Configure HTTP client with base URL and timeout
 client = httpx.Client(base_url=API_BASE, timeout=TIMEOUT)
 atexit.register(lambda: client.close())
@@ -47,8 +45,9 @@ def get_token(token: Optional[str] = None) -> str:
     """Retrieve API token from argument, env, or prompt."""
     if token:
         return token
-    if L1NKZIP_TOKEN:
-        return L1NKZIP_TOKEN
+    env_token = os.environ.get("L1NKZIP_TOKEN")
+    if env_token:
+        return env_token
     return typer.prompt("Enter your API token", hide_input=True)
 
 
