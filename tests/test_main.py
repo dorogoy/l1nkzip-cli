@@ -59,23 +59,23 @@ class TestGetToken:
     def test_token_from_env(self, mock_api_request):
         """Test that token is taken from environment variable when not provided as argument."""
         mock_api_request.return_value = []  # Simulate API call
-        with patch.dict(os.environ, {"L1NKZIP_TOKEN": "env-token"}):
-            with patch("main.typer.prompt") as mock_prompt:
-                runner.invoke(app, ["info", "test-link"])
-                # The token should be used without prompting
-                mock_prompt.assert_not_called()
+        with patch.dict(os.environ, {"L1NKZIP_TOKEN": "env-token"}), patch(
+            "main.typer.prompt"
+        ) as mock_prompt:
+            runner.invoke(app, ["info", "test-link"])
+            # The token should be used without prompting
+            mock_prompt.assert_not_called()
 
     @patch("main.api_request")
     def test_token_from_prompt(self, mock_api_request):
         """Test that token is prompted when not provided as argument or env var."""
         mock_api_request.return_value = []  # Simulate API call
-        with patch.dict(os.environ, {}, clear=True):
-            with patch(
-                "main.typer.prompt", return_value="prompted-token"
-            ) as mock_prompt:
-                runner.invoke(app, ["info", "test-link"])
-                # Should prompt for token
-                mock_prompt.assert_called_once()
+        with patch.dict(os.environ, {}, clear=True), patch(
+            "main.typer.prompt", return_value="prompted-token"
+        ) as mock_prompt:
+            runner.invoke(app, ["info", "test-link"])
+            # Should prompt for token
+            mock_prompt.assert_called_once()
 
 
 class TestShortenCommand:

@@ -21,7 +21,7 @@ Commands:
 import atexit
 import os
 import re
-from typing import Any, Optional
+from typing import Any
 
 import httpx
 import typer
@@ -41,7 +41,7 @@ client = httpx.Client(base_url=API_BASE, timeout=TIMEOUT)
 atexit.register(lambda: client.close())
 
 
-def get_token(token: Optional[str] = None) -> str:
+def get_token(token: str | None = None) -> str:
     """Retrieve API token from argument, env, or prompt."""
     if token:
         return token
@@ -51,7 +51,7 @@ def get_token(token: Optional[str] = None) -> str:
     return typer.prompt("Enter your API token", hide_input=True)
 
 
-def api_request(method: str, path: str, token: Optional[str] = None, **kwargs) -> Any:
+def api_request(method: str, path: str, token: str | None = None, **kwargs) -> Any:
     """Make request to API, return parsed JSON or raise typer.Exit on error."""
     headers = {}
     if token:
@@ -65,7 +65,7 @@ def api_request(method: str, path: str, token: Optional[str] = None, **kwargs) -
         try:
             err = exc.response.json()
             msg = err.get("detail") or str(err)
-        except Exception:
+        except Exception:  # noqa: BLE001 — any JSON/text decode failure falls back to raw text
             msg = exc.response.text
         console.print(f"[red]HTTP {exc.response.status_code}:[/red] {msg}")
         raise typer.Exit(1)
@@ -100,7 +100,7 @@ def shorten(
     except typer.Exit:
         # Error already printed by api_request
         pass
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001 — CLI boundary: report any error via rich and exit cleanly
         console.print(f"[red]Error:[/red] {e}")
         raise typer.Exit(1)
 
@@ -108,7 +108,7 @@ def shorten(
 @app.command()
 def info(
     link: str,
-    token: Optional[str] = typer.Option(
+    token: str | None = typer.Option(
         None, help="API token (or set L1NKZIP_TOKEN env var)"
     ),
     limit: int = typer.Option(DEFAULT_LIMIT, help="Max number of URLs to search"),
@@ -122,7 +122,7 @@ def info(
     except typer.Exit:
         # Error already printed by api_request
         return
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001 — CLI boundary: report any error via rich and exit cleanly
         console.print(f"[red]Error:[/red] {e}")
         raise typer.Exit(1)
 
@@ -150,7 +150,7 @@ def info(
 
 @app.command()
 def list(
-    token: Optional[str] = typer.Option(
+    token: str | None = typer.Option(
         None, help="API token (or set L1NKZIP_TOKEN env var)"
     ),
     limit: int = typer.Option(DEFAULT_LIMIT, help="Max number of URLs to list"),
@@ -174,14 +174,14 @@ def list(
     except typer.Exit:
         # Error already printed by api_request
         pass
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001 — CLI boundary: report any error via rich and exit cleanly
         console.print(f"[red]Error:[/red] {e}")
         raise typer.Exit(1)
 
 
 @app.command()
 def update_phishtank(
-    token: Optional[str] = typer.Option(
+    token: str | None = typer.Option(
         None, help="API token (or set L1NKZIP_TOKEN env var)"
     ),
     cleanup_days: int = typer.Option(
@@ -207,7 +207,7 @@ def update_phishtank(
     except typer.Exit:
         # Error already printed by api_request
         pass
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001 — CLI boundary: report any error via rich and exit cleanly
         console.print(f"[red]Error:[/red] {e}")
         raise typer.Exit(1)
 
