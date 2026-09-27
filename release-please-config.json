@@ -11,6 +11,11 @@
         {
           "type": "generic",
           "path": "main.py"
+        },
+        {
+          "type": "toml",
+          "path": "uv.lock",
+          "jsonpath": "$.package[?(@.name.value=='l1nkzip')].version"
         }
       ]
     }

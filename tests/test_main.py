@@ -3,6 +3,7 @@ import os
 import shutil
 import subprocess
 import sys
+import tomllib
 import urllib.error
 from contextlib import contextmanager
 from pathlib import Path
@@ -483,6 +484,9 @@ class TestVersionAndUpdate:
         assert version_line.split()[0] == main.VERSION
         project = (root / "pyproject.toml").read_text(encoding="utf-8")
         assert f'version = "{main.VERSION}"' in project
+        lockfile = tomllib.loads((root / "uv.lock").read_text(encoding="utf-8"))
+        package = next(p for p in lockfile["package"] if p["name"] == "l1nkzip")
+        assert package["version"] == main.VERSION
 
     def test_version_command(self):
         result = runner.invoke(app, ["version"])
@@ -533,7 +537,7 @@ class TestVersionAndUpdate:
         result = runner.invoke(app, ["shorten", "https://example.com", "--json"])
         assert result.exit_code == 0
         assert json.loads(result.stdout)["link"] == "abc123"
-        assert "Update available: 0.1.0 -> 9.9.9" in result.stderr
+        assert f"Update available: {main.VERSION} -> 9.9.9" in result.stderr
 
     def test_notice_from_cache(self, monkeypatch, tmp_path: Path):
         monkeypatch.delenv("L1NKZIP_NO_UPDATE_CHECK", raising=False)
@@ -547,7 +551,7 @@ class TestVersionAndUpdate:
         monkeypatch.setattr(main.notice, "print", lambda msg: printed.append(msg))
         main.maybe_check_update()
         assert printed
-        assert "0.1.0 -> 9.9.9" in printed[0]
+        assert f"{main.VERSION} -> 9.9.9" in printed[0]
         assert "l1nkzip update" in printed[0]
 
     def test_corrupt_cache_is_replaced(self, monkeypatch, tmp_path: Path):
