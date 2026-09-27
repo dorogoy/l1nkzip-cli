@@ -501,6 +501,18 @@ class TestVersionAndUpdate:
         assert not main._is_newer("0.1.0", "0.2.0")
         assert not main._is_newer("0.1", "0.1.0")
 
+    def test_fetch_remote_version_tolerates_marker(self, monkeypatch):
+        class _Body:
+            def read(self, _n: int = -1) -> bytes:
+                return b"9.9.9 # x-release-please-version\n"
+
+        @contextmanager
+        def _open(*_args: object, **_kwargs: object):
+            yield _Body()
+
+        monkeypatch.setattr(main.urllib.request, "urlopen", _open)
+        assert main._fetch_remote_version() == "9.9.9"
+
     @patch("main.api_request")
     def test_notice_leaves_json_stdout_intact(
         self, mock_api_request, monkeypatch, tmp_path: Path

@@ -149,7 +149,7 @@ def _fetch_remote_version() -> str:
     with urllib.request.urlopen(req, timeout=_UPDATE_TIMEOUT) as resp:
         text = resp.read(64).decode("utf-8", errors="replace")
     line = text.strip().splitlines()[0].strip()
-    token = line.split()[0] if line else ""
+    token = line.split()[0]
     if not re.fullmatch(r"\d+(?:\.\d+)*", token):
         raise ValueError(line)
     return token
