@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.0](https://github.com/dorogoy/l1nkzip-cli/compare/v0.1.0...v0.2.0) (2026-09-27)
+
+
+### Features
+
+* install with uv tool and add self-update ([#24](https://github.com/dorogoy/l1nkzip-cli/issues/24)) ([a1de3fd](https://github.com/dorogoy/l1nkzip-cli/commit/a1de3fda3461071101116d2071a98e0fd2b158c0))
+
 ## 0.1.0 (2026-09-27)
 
 
