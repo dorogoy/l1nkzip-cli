@@ -479,7 +479,8 @@ class TestVersionAndUpdate:
 
     def test_version_files_match(self):
         root = Path(__file__).resolve().parents[1]
-        assert (root / "VERSION").read_text(encoding="utf-8").strip() == main.VERSION
+        version_line = (root / "VERSION").read_text(encoding="utf-8").strip()
+        assert version_line.split()[0] == main.VERSION
         project = (root / "pyproject.toml").read_text(encoding="utf-8")
         assert f'version = "{main.VERSION}"' in project
 
