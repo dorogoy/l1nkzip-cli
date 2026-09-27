@@ -38,7 +38,7 @@ import typer
 from rich.console import Console
 from rich.table import Table
 
-VERSION = "0.1.0"
+VERSION = "0.1.0"  # x-release-please-version
 _GIT_TOOL = "git+https://github.com/dorogoy/l1nkzip-cli"
 _RAW_MAIN = "https://raw.githubusercontent.com/dorogoy/l1nkzip-cli/master/main.py"
 _RAW_VERSION = "https://raw.githubusercontent.com/dorogoy/l1nkzip-cli/master/VERSION"
@@ -149,9 +149,10 @@ def _fetch_remote_version() -> str:
     with urllib.request.urlopen(req, timeout=_UPDATE_TIMEOUT) as resp:
         text = resp.read(64).decode("utf-8", errors="replace")
     line = text.strip().splitlines()[0].strip()
-    if not re.fullmatch(r"\d+(?:\.\d+)*", line):
+    token = line.split()[0]
+    if not re.fullmatch(r"\d+(?:\.\d+)*", token):
         raise ValueError(line)
-    return line
+    return token
 
 
 def maybe_check_update() -> None:
