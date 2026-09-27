@@ -9,7 +9,8 @@ A simple, modern Python CLI to interact with the [L1nkZip](https://l1nk.zip) URL
 - List all your shortened URLs (requires API token)
 - Update the PhishTank database (admin, requires API token)
 - Uses the [rich](https://github.com/Textualize/rich) library for pretty output
-- Self-contained, runs with [uv](https://github.com/astral-sh/uv) (no manual pip install needed)
+- Installs with one command via [uv tool](https://docs.astral.sh/uv/concepts/tools/)
+- Updates itself with `l1nkzip update`
 
 ## Requirements
 
@@ -19,33 +20,19 @@ A simple, modern Python CLI to interact with the [L1nkZip](https://l1nk.zip) URL
 
 ## Installation
 
-### Quick Install (Recommended)
-
-You can download and install the `l1nkzip` executable with a single command:
-
 ```sh
-curl -sSL https://raw.githubusercontent.com/dorogoy/l1nkzip-cli/master/main.py -o l1nkzip && chmod +x l1nkzip
+curl -sSL https://raw.githubusercontent.com/dorogoy/l1nkzip-cli/master/install.sh | bash
 ```
 
-This will download the script and make it executable in your current directory.
+`INSTALL_DIR` chooses the directory the `l1nkzip` executable is placed in. If that directory is not on `PATH`, the script prints the exact line to add to your shell rc.
 
-#### System-Wide Access
-
-To make `l1nkzip` available from anywhere, move it to a directory in your system's `PATH`:
+If you already have [uv](https://docs.astral.sh/uv/):
 
 ```sh
-sudo mv l1nkzip /usr/local/bin/
+uv tool install git+https://github.com/dorogoy/l1nkzip-cli
 ```
 
-### Manual Installation
-
-Alternatively, you can clone the repository and run the script directly:
-
-```sh
-git clone https://github.com/dorogoy/l1nkzip-cli.git
-cd l1nkzip-cli
-./main.py --help
-```
+To run from a checkout instead: `uv run main.py --help`.
 
 ## Usage
 
@@ -61,6 +48,10 @@ l1nkzip --help
 - `info <link>`: Get information about a shortened link.
 - `list [--token <token>] [--limit <n>]`: List all your shortened URLs (requires an API token).
 - `update-phishtank [--token <token>] [--cleanup-days <n>]`: Update the PhishTank database (admin-only, requires an API token).
+- `version`: Print the version. `--version` does the same.
+- `update`: Update to the latest version. A uv tool install reinstalls from git; a plain copy of `main.py` replaces itself from GitHub.
+
+On other commands, l1nkzip checks GitHub at most once a day and prints a one-line notice when a newer version exists. Skip that check with `--no-update-check` or `L1NKZIP_NO_UPDATE_CHECK=1`. The check fails silently when you are offline.
 
 ### Configuration
 
