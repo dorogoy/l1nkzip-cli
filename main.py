@@ -38,7 +38,7 @@ import typer
 from rich.console import Console
 from rich.table import Table
 
-VERSION = "0.2.0"  # x-release-please-version
+VERSION = "0.3.0"  # x-release-please-version
 _GIT_TOOL = "git+https://github.com/dorogoy/l1nkzip-cli"
 _RAW_MAIN = "https://raw.githubusercontent.com/dorogoy/l1nkzip-cli/master/main.py"
 _RAW_VERSION = "https://raw.githubusercontent.com/dorogoy/l1nkzip-cli/master/VERSION"
