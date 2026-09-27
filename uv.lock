@@ -167,9 +167,9 @@ wheels = [
 ]
 
 [[package]]
-name = "l1nkzip-cli"
+name = "l1nkzip"
 version = "0.1.0"
-source = { virtual = "." }
+source = { editable = "." }
 dependencies = [
     { name = "httpx" },
     { name = "rich" },
