@@ -33,8 +33,9 @@ if ! command -v uv >/dev/null 2>&1; then
 fi
 
 if [ -n "${INSTALL_DIR:-}" ]; then
-  uv tool install --force --bin-dir "$INSTALL_DIR" "$REPO_URL"
-  bin_dir=$INSTALL_DIR
+  # A trailing slash would miss the PATH-component check below.
+  bin_dir=${INSTALL_DIR%/}
+  uv tool install --force --bin-dir "$bin_dir" "$REPO_URL"
 else
   uv tool install --force "$REPO_URL"
   bin_dir=$(uv tool dir --bin)

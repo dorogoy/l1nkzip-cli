@@ -537,6 +537,27 @@ class TestVersionAndUpdate:
         assert "0.1.0 -> 9.9.9" in printed[0]
         assert "l1nkzip update" in printed[0]
 
+    def test_corrupt_cache_is_replaced(self, monkeypatch, tmp_path: Path):
+        monkeypatch.delenv("L1NKZIP_NO_UPDATE_CHECK", raising=False)
+        cache = tmp_path / "update-check.json"
+        cache.write_text("[1, 2]", encoding="utf-8")
+        monkeypatch.setattr(main, "_cache_file", lambda: cache)
+        calls = {"n": 0}
+
+        class _Body:
+            def read(self, _n: int = -1) -> bytes:
+                return b"9.9.9\n"
+
+        @contextmanager
+        def _open(*_args: object, **_kwargs: object):
+            calls["n"] += 1
+            yield _Body()
+
+        monkeypatch.setattr(main.urllib.request, "urlopen", _open)
+        main.maybe_check_update()
+        assert calls["n"] == 1
+        assert json.loads(cache.read_text(encoding="utf-8"))["remote"] == "9.9.9"
+
     def test_offline_check_is_cached(self, monkeypatch, tmp_path: Path):
         monkeypatch.delenv("L1NKZIP_NO_UPDATE_CHECK", raising=False)
         cache = tmp_path / "update-check.json"
@@ -583,6 +604,25 @@ class TestVersionAndUpdate:
         assert main._download_replace(target) == "1.2.3"
         assert 'VERSION = "1.2.3"' in target.read_text(encoding="utf-8")
         assert os.access(target, os.X_OK)
+
+    def test_download_replace_rejects_missing_version(
+        self, monkeypatch, tmp_path: Path
+    ):
+        target = tmp_path / "l1nkzip"
+        target.write_text("old\n", encoding="utf-8")
+
+        class _Body:
+            def read(self, _n: int = -1) -> bytes:
+                return b"<html>nope</html>\n"
+
+        @contextmanager
+        def _open(*_args: object, **_kwargs: object):
+            yield _Body()
+
+        monkeypatch.setattr(main.urllib.request, "urlopen", _open)
+        with pytest.raises(ValueError, match="VERSION"):
+            main._download_replace(target)
+        assert target.read_text(encoding="utf-8") == "old\n"
 
     def test_update_command_rewrites_file(self, monkeypatch):
         monkeypatch.setattr(main, "_is_uv_tool_install", lambda: False)

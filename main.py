@@ -163,7 +163,9 @@ def maybe_check_update() -> None:
         now = time.time()
         if path.is_file():
             try:
-                data: dict[str, Any] = json.loads(path.read_text(encoding="utf-8"))
+                data = json.loads(path.read_text(encoding="utf-8"))
+                if not isinstance(data, dict):
+                    raise TypeError("cache root must be an object")
                 checked = float(data.get("checked", 0))
                 if now - checked < _UPDATE_INTERVAL:
                     _announce(data.get("remote"))
@@ -288,7 +290,9 @@ def _download_replace(target: Path) -> str:
     with urllib.request.urlopen(req, timeout=30) as resp:
         data = resp.read()
     match = re.search(rb'(?m)^VERSION\s*=\s*"([^"]+)"', data)
-    new_version = match.group(1).decode("utf-8") if match else VERSION
+    if match is None:
+        raise ValueError("downloaded main.py is missing VERSION")
+    new_version = match.group(1).decode("utf-8")
     fd, name = tempfile.mkstemp(prefix=".l1nkzip-", suffix=".tmp", dir=target.parent)
     tmp = Path(name)
     try:
