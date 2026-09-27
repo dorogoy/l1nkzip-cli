@@ -3,6 +3,7 @@ import os
 import shutil
 import subprocess
 import sys
+import tomllib
 import urllib.error
 from contextlib import contextmanager
 from pathlib import Path
@@ -483,8 +484,9 @@ class TestVersionAndUpdate:
         assert version_line.split()[0] == main.VERSION
         project = (root / "pyproject.toml").read_text(encoding="utf-8")
         assert f'version = "{main.VERSION}"' in project
-        lockfile = (root / "uv.lock").read_text(encoding="utf-8")
-        assert f'name = "l1nkzip"\nversion = "{main.VERSION}"' in lockfile
+        lockfile = tomllib.loads((root / "uv.lock").read_text(encoding="utf-8"))
+        package = next(p for p in lockfile["package"] if p["name"] == "l1nkzip")
+        assert package["version"] == main.VERSION
 
     def test_version_command(self):
         result = runner.invoke(app, ["version"])
